@@ -129,7 +129,7 @@ var tick = (elapsedTime, multiplier) => {
     q += (getQ1(q1.level).pow(getQ1Exponent(q1Exp.level)) * getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))) / BigNumber.TWO
     beta = getC1(c1.level).pow(getC1Exponent(c1Exp.level)) / getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))
     currency.value += dt * bonus * getC1(c1.level).pow(BigNumber.TWO ** getC1Exponent(c1Exp.level)) * q /
-                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.square();
+                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.pow(1.5);
     }
     theory.invalidateTertiaryEquation();
 }
@@ -171,7 +171,7 @@ var getPrimaryEquation = () => {
     if (c1Exp.level == 2) result += "^{1.1}";
     if (c1Exp.level == 3) result += "^{1.15}";
 
-    result += "}q^{2}\\quad \\dot{q}=\\frac{q_1"
+    result += "}q^{1.5}\\quad \\dot{q}=\\frac{q_1"
     
 
     if (q1Exp.level == 1) result += "^{1.1}";
