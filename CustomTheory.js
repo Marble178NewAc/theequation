@@ -232,7 +232,7 @@ var setInternalState = (state) => {
     let values = state.split(" ");
     if (values.length > 0) q = parseBigNumber(values[0]);
 }
-var getPublicationMultiplier = (tau) => tau.pow(1.1) / BigNumber.THREE;
+var getPublicationMultiplier = (tau) => BigNumber.ONE;
 var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{1.1}}{3}";
 var getTau = () => currency.value;
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
