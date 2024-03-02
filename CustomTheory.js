@@ -1,4 +1,4 @@
-﻿import { ExponentialCost, FreeCost, LinearCost } from "./api/Costs";
+import { ExponentialCost, FreeCost, LinearCost } from "./api/Costs";
 import { Localization } from "./api/Localization";
 import { BigNumber } from "./api/BigNumber";
 import { theory } from "./api/Theory";
@@ -128,8 +128,8 @@ var tick = (elapsedTime, multiplier) => {
     else {
     q += (getQ1(q1.level).pow(getQ1Exponent(q1Exp.level)) * getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))) / BigNumber.TWO
     beta = getC1(c1.level).pow(getC1Exponent(c1Exp.level)) / getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))
-    currency.value += dt * bonus * getC1(c1.level).pow(getC1Exponent(c1Exp.level).square()) * q /
-                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO);
+    currency.value += dt * bonus * getC1(c1.level).pow(BigNumber.TWO ** getC1Exponent(c1Exp.level)) * q /
+                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.square();
     }
     theory.invalidateTertiaryEquation();
 }
@@ -137,9 +137,13 @@ var tick = (elapsedTime, multiplier) => {
 var getPrimaryEquation = () => {
     let result = "\\dot{\\rho} = \\frac{c_1";
 
-    if (c1Exp.level == 1) result += "^{1.05^{2}}";
-    if (c1Exp.level == 2) result += "^{1.1^{2}}";
-    if (c1Exp.level == 3) result += "^{1.15^{2}}";
+    if (c1Exp.level == 1) result += "^{1.05";
+    if (c1Exp.level == 2) result += "^{1.1";
+    if (c1Exp.level == 3) result += "^{1.15";
+
+    result += "^{2}";
+
+    if (c1Exp.level >= 1) result += "}";
 
     result += "q";
 
@@ -155,7 +159,20 @@ var getPrimaryEquation = () => {
     if (c2Exp.level == 2) result += "^{1.1}";
     if (c2Exp.level == 3) result += "^{1.15}";
 
-    result += "\\frac{q}{2}\\quad \\dot{q}=\\frac{q_1";
+    result += "\\frac{q}{2}+\\frac{c_2";
+    
+    if (c2Exp.level == 1) result += "^{1.05}";
+    if (c2Exp.level == 2) result += "^{1.1}";
+    if (c2Exp.level == 3) result += "^{1.15}";
+
+    result += "}{c_1";
+
+    if (c1Exp.level == 1) result += "^{1.05}";
+    if (c1Exp.level == 2) result += "^{1.1}";
+    if (c1Exp.level == 3) result += "^{1.15}";
+
+    result += "}q^{2}\\quad \\dot{q}=\\frac{q_1"
+    
 
     if (q1Exp.level == 1) result += "^{1.1}";
     if (q1Exp.level == 2) result += "^{1.2}";
@@ -184,6 +201,7 @@ var getPrimaryEquation = () => {
     result += "}"
 
     theory.primaryEquationHeight = 100;
+    theory.primaryEquationScale = 0.9;
 
     return result;
 }
@@ -209,8 +227,13 @@ var getTertiaryEquation = () => {
 
     return result;
 }
-var getPublicationMultiplier = (tau) => tau.pow(0.164) / BigNumber.THREE;
-var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{0.164}}{3}";
+var getInternalState = () => `${q}`;
+var setInternalState = (state) => {
+    let values = state.split(" ");
+    if (values.length > 0) q = parseBigNumber(values[0]);
+}
+var getPublicationMultiplier = (tau) => tau.pow(1.1) / BigNumber.THREE;
+var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{1.1}}{3}";
 var getTau = () => currency.value;
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
 
