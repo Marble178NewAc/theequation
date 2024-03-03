@@ -1,4 +1,4 @@
-import { ExponentialCost, FreeCost, LinearCost } from "./api/Costs";
+import { ConstantCost, ExponentialCost, FirstFreeCost, FreeCost, LinearCost } from "./api/Costs";
 import { Localization } from "./api/Localization";
 import { BigNumber } from "./api/BigNumber";
 import { theory } from "./api/Theory";
@@ -12,6 +12,8 @@ var version = 1;
 
 var currency;
 var c1, c2, q1, q2;
+var c21, c22, c23, n;
+var page;
 var q = BigNumber.ONE;
 var beta = BigNumber.ONE;
 var c1Exp, c2Exp;
@@ -21,6 +23,9 @@ var chapter1, chapter2;
 
 var init = () => {
     currency = theory.createCurrency();
+    currency2 = theory.createCurrency();
+
+    let baseId = 0
 
     ///////////////////
     // Regular Upgrades
@@ -54,6 +59,45 @@ var init = () => {
         q2 = theory.createUpgrade(3, currency, new ExponentialCost(5, Math.log2(10)));
         q2.getDescription = (_) => Utils.getMath(getDesc(q2.level));
         q2.getInfo = (amount) => Utils.getMathTo(getInfo(q2.level), getInfo(q2.level + amount));
+    }
+    // page number
+    {
+        let getDesc = (level) => "\\text{page}=" + getPage(level).toString(0);
+        page = theory.createUpgrade(4, currency, new ConstantCost(0));
+        page.getDescription = (_) => Utils.getMath(getDesc(page.level));
+        page.getInfo = (amount) => Utils.getMathTo(getDesc(page.level), getDesc(page.level + amount));
+    }
+
+    baseId += 100;
+
+    // c1
+    {
+        let getDesc = (level) => "c_1=" + getC21(level).toString(0);
+        c21 = theory.createUpgrade(baseId, currency2, new FirstFreeCost(new ExponentialCost(10, Math.log2(2))));
+        c21.getDescription = (_) => Utils.getMath(getDesc(c21.level));
+        c21.getInfo = (amount) => Utils.getMathTo(getDesc(c21.level), getDesc(c21.level + amount));
+    }
+    // c2
+    {
+        let getDesc = (level) => "c_2=2^{" + level + "}";
+        let getInfo = (level) => "c_2=" + getC22(level).toString(0);
+        c22 = theory.createUpgrade(baseId+1, currency2, new ExponentialCost(5, Math.log2(2)));
+        c22.getDescription = (_) => Utils.getMath(getDesc(c22.level));
+        c22.getInfo = (amount) => Utils.getMathTo(getInfo(c22.level), getInfo(c22.level + amount));
+    }
+    // c3
+    {
+        let getDesc = (level) => "c_3=" + getC23(level).toString(0);
+        c23 = theory.createUpgrade(baseId+2, currency2, new ExponentialCost(100, Math.log2(1.5)))
+        c23.getDescription = (_) => Utils.getMath(getDesc(c23.level));
+        c23.getInfo = (amount) => Utils.getMathTo(getDesc(c23.level), getDesc(c23.level + amount));
+    }
+    // n
+    {
+        let getDesc = (level) => "n=" + getN(level).toString(0);
+        n = theory.createUpgrade(baseId+3, currency2, new ExponentialCost(10, Math.log2(2)));
+        n.getDescription = (_) => Utils.getMath(getDesc(n.level));
+        n.getInfo = (amount) => Utils.getMathTo(getDesc(n.level), getDesc(n.level + amount));
     }
 
     /////////////////////
@@ -110,12 +154,25 @@ var init = () => {
     //// Story chapters
     chapter1 = theory.createStoryChapter(0, "The Start", "You started in this theory\nI don't know why\nBut you just started this theory\nThis is the only chapter\nGood luck", () => c1.level > 0);
 
+    page.maxLevel = 1;
+
     updateAvailability();
 }
 
 var updateAvailability = () => {
     c2Exp.isAvailable = c1Exp.level > 0;
     q2Exp.isAvailable = q1Exp.level > 0;
+    page.isAvailable = c1.level > 0;
+
+    c1.isAvailable = page.level == 0;
+    c2.isAvailable = page.level == 0;
+    q1.isAvailable = page.level == 0;
+    q2.isAvailable = page.level == 0;
+
+    c21.isAvailable = page.level == 1;
+    c22.isAvailable = page.level == 1;
+    c23.isAvailable = page.level == 1;
+    n.isAvailable = page.level == 1;
 }
 
 var tick = (elapsedTime, multiplier) => {
@@ -125,17 +182,27 @@ var tick = (elapsedTime, multiplier) => {
         q = getQ1(q1.level).pow(getQ1Exponent(q1Exp.level));
         currency.value += dt * bonus * getC1(c1.level).pow(getC1Exponent(c1Exp.level).square()) * q;
     }
-    else {
+    else if (page.level == 0) {
     q += (getQ1(q1.level).pow(getQ1Exponent(q1Exp.level)) * getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))) / BigNumber.TWO
     beta = getC1(c1.level).pow(getC1Exponent(c1Exp.level)) / getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))
     currency.value += dt * bonus * getC1(c1.level).pow(BigNumber.TWO ** getC1Exponent(c1Exp.level)) * q /
-                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.pow(1.5);
+                                   getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + currency2.value * (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.pow(1.5);
     }
+    else if (page.level == 1) {
+    for(let i = 0; i <= getN(n.level); i++) {
+    currency2.value += dt * bonus * (BigNumber.TWO * getC21(c21.level)) * (getC22(c22.level) / BigNumber.TWO); 
+    }
+    }
+    theory.invalidatePrimaryEquation();
     theory.invalidateTertiaryEquation();
+    updateAvailability();
 }
 
 var getPrimaryEquation = () => {
-    let result = "\\dot{\\rho} = \\frac{c_1";
+    let result = "";
+
+    if (page.level == 0) {
+    result = "\\dot{\\rho_1} = \\frac{c_1";
 
     if (c1Exp.level == 1) result += "^{1.05";
     if (c1Exp.level == 2) result += "^{1.1";
@@ -199,6 +266,10 @@ var getPrimaryEquation = () => {
     if (q2Exp.level == 3) result += "^{1.3}";
 
     result += "}"
+    }
+    else if (page.level == 1) {
+    result += "\\sum_{a=1}^{n} (2c_1\\frac{c_2}{2})^{c_3}"
+    }
 
     theory.primaryEquationHeight = 100;
     theory.primaryEquationScale = 0.9;
@@ -206,10 +277,13 @@ var getPrimaryEquation = () => {
     return result;
 }
 
-var getSecondaryEquation = () => theory.latexSymbol + "=\\max\\rho";
+var getSecondaryEquation = () => theory.latexSymbol + "=\\max\\rho_1";
 
 var getTertiaryEquation = () => {
-    let result = "q = ";
+    let result = "";
+
+    if (page.level == 0) {
+    result = "q = ";
 
     result += q.toString(3);
 
@@ -224,6 +298,7 @@ var getTertiaryEquation = () => {
     result += "\\beta = ";
 
     result += (getC1(c1.level).pow(getC1Exponent(c1Exp.level).square()) / getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))).toString(3);
+    }
 
     return result;
 }
@@ -232,8 +307,9 @@ var setInternalState = (state) => {
     let values = state.split(" ");
     if (values.length > 0) q = parseBigNumber(values[0]);
 }
-var getPublicationMultiplier = (tau) => BigNumber.ONE;
-var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{1.1}}{3}";
+var alwaysShowRefundButtons = () => true;
+var getPublicationMultiplier = (tau) => tau.pow(0.121)/BigNumber.FOUR;
+var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{0.121}}{4}";
 var getTau = () => currency.value;
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
 
@@ -241,6 +317,11 @@ var getC1 = (level) => Utils.getStepwisePowerSum(level, 2, 10, 0);
 var getC2 = (level) => BigNumber.TWO.pow(level);
 var getQ1 = (level) => Utils.getStepwisePowerSum(level+1, 2, 4, 0);
 var getQ2 = (level) => BigNumber.TWO.pow(level);
+var getPage = (level) => BigNumber.from(level+1);
+var getC21 = (level) => Utils.getStepwisePowerSum(level, 2, 10, 0);
+var getC22 = (level) => BigNumber.TWO.pow(level);
+var getC23 = (level) => Utils.getStepwisePowerSum(level+1, 2, 4, 0);
+var getN = (level) => BigNumber.from(level+1);
 var getC1Exponent = (level) => BigNumber.from(1 + 0.05 * level);
 var getC2Exponent = (level) => BigNumber.from(1 + 0.05 * level);
 var getQ1Exponent = (level) => BigNumber.from(1 + 0.1 * level);
