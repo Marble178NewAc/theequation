@@ -155,6 +155,7 @@ var init = () => {
     chapter1 = theory.createStoryChapter(0, "The Start", "You started in this theory\nI don't know why\nBut you just started this theory\nThis is the only chapter\nGood luck", () => c1.level > 0);
 
     page.maxLevel = 1;
+    n.maxLevel = 40;
 
     updateAvailability();
 }
@@ -226,7 +227,7 @@ var getPrimaryEquation = () => {
     if (c2Exp.level == 2) result += "^{1.1}";
     if (c2Exp.level == 3) result += "^{1.15}";
 
-    result += "\\frac{q}{2}+\\frac{c_2";
+    result += "\\frac{q}{2}+\\frac{\\rho_2}{1000}\\frac{c_2";
     
     if (c2Exp.level == 1) result += "^{1.05}";
     if (c2Exp.level == 2) result += "^{1.1}";
@@ -268,12 +269,13 @@ var getPrimaryEquation = () => {
     result += "}"
     }
     else if (page.level == 1) {
-    result += "\\sum_{a=1}^{n} (2c_1\\frac{c_2}{2})^{c_3}"
+    result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} (2c_1\\frac{c_2}{2})^\\frac{c_3}{100}"
     }
 
+    if (page.level == 0) theory.primaryEquationScale = 0.9;
+    if (page.level == 1) theory.primaryEquationScale = 1.2;
     theory.primaryEquationHeight = 100;
-    theory.primaryEquationScale = 0.9;
-
+    
     return result;
 }
 
