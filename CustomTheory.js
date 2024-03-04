@@ -81,7 +81,7 @@ var init = () => {
     {
         let getDesc = (level) => "c_2=2^{" + level + "}";
         let getInfo = (level) => "c_2=" + getC22(level).toString(0);
-        c22 = theory.createUpgrade(baseId+1, currency2, new ExponentialCost(5, Math.log2(2)));
+        c22 = theory.createUpgrade(baseId+1, currency2, c22Cost);
         c22.getDescription = (_) => Utils.getMath(getDesc(c22.level));
         c22.getInfo = (amount) => Utils.getMathTo(getInfo(c22.level), getInfo(c22.level + amount));
     }
@@ -99,6 +99,13 @@ var init = () => {
         n.getDescription = (_) => Utils.getMath(getDesc(n.level));
         n.getInfo = (amount) => Utils.getMathTo(getDesc(n.level), getDesc(n.level + amount));
     }
+    // Cost for c22
+    let c22Cost = new CustomCost((level) =>
+        {
+            var cost = 1;
+            cost = cost * 11 ** level;
+            return BigNumber.from(cost);
+        })
 
     /////////////////////
     // Permanent Upgrades
