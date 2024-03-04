@@ -62,7 +62,7 @@ var init = () => {
     }
     // page number
     {
-        let getDesc = (level) => "\\text{page}=" + getPage(level).toString(0);
+        let getDesc = (level) => "\\text{Page}" + getPage(level).toString(0);
         page = theory.createUpgrade(4, currency, new ConstantCost(0));
         page.getDescription = (_) => Utils.getMath(getDesc(page.level));
         page.getInfo = (amount) => Utils.getMathTo(getDesc(page.level), getDesc(page.level + amount));
