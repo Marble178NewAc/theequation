@@ -198,7 +198,7 @@ var tick = (elapsedTime, multiplier) => {
     }
     else if (page.level == 1) {
     for(let i = 0; i <= getN(n.level); i++) {
-    currency2.value += dt * bonus * (BigNumber.TWO * getC21(c21.level)) * (getC22(c22.level) / BigNumber.TWO); 
+    currency2.value += dt * bonus * ((BigNumber.TWO * getC21(c21.level)) * (getC22(c22.level) / BigNumber.TWO)).pow(BigNumber.ONE + getC23(c23.level)); 
     }
     }
     theory.invalidatePrimaryEquation();
@@ -276,7 +276,7 @@ var getPrimaryEquation = () => {
     result += "}"
     }
     else if (page.level == 1) {
-    result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} (2c_1\\frac{c_2}{2})^\\frac{c_3}{100}"
+    result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} (2c_1\\frac{c_2}{2})^1+\\frac{c_3}{100}"
     }
 
     if (page.level == 0) theory.primaryEquationScale = 0.9;
