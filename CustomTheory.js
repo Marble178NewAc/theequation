@@ -73,7 +73,7 @@ var init = () => {
     let c22Cost = new CustomCost((level) =>
         {
             var cost = 1;
-            cost = BigNumber.from(cost) * 1.5564916878 ** level;
+            cost = BigNumber.from(cost) * BigNumber.from(3.74447096981) ** level;
             return BigNumber.from(cost);
         });
 
