@@ -204,7 +204,7 @@ var tick = (elapsedTime, multiplier) => {
     }
     else if (page.level == 1) {
     for(let i = 0; i <= getN(n.level); i++) {
-    currency2.value += dt * bonus * (((BigNumber.TWO * getC21(c21.level)) * (getC22(c22.level) / BigNumber.TWO)).pow(BigNumber.ONE + getC23(c23.level)))/BigNumber.THOUSAND; 
+    currency2.value += dt * bonus * (((BigNumber.TWO * getC21(c21.level)) * (getC22(c22.level) / BigNumber.TWO)))/BigNumber.THOUSAND.pow(BigNumber.ONE + getC23(c23.level)); 
     }
     }
     theory.invalidatePrimaryEquation();
