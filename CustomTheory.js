@@ -4,7 +4,7 @@ import { BigNumber } from "./api/BigNumber";
 import { theory } from "./api/Theory";
 import { Utils } from "./api/Utils";
 
-var id = "test_test";
+var id = "the_equation";
 var name = "The Equation";
 var description = "A basic equation\nThat's it.";
 var authors = "Marble178";
