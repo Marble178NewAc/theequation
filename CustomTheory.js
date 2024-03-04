@@ -315,7 +315,9 @@ var getPublicationMultiplier = (tau) => tau.pow(0.121)/BigNumber.FOUR;
 var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{0.121}}{4}";
 var getTau = () => currency.value;
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
+var canGoToPreviousStage = () => c1.level > 0;
 var goToPreviousStage = () => page.level -= 1;
+var canGoToNextStage = () => c1.level > 0;
 var goToNextStage = () => page.level += 1;
 
 var getC1 = (level) => Utils.getStepwisePowerSum(level, 2, 10, 0);
