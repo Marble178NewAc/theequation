@@ -164,7 +164,6 @@ var init = () => {
 var updateAvailability = () => {
     c2Exp.isAvailable = c1Exp.level > 0;
     q2Exp.isAvailable = q1Exp.level > 0;
-    page.isAvailable = 0;
 
     c1.isAvailable = page.level == 0;
     c2.isAvailable = page.level == 0;
@@ -311,14 +310,10 @@ var setInternalState = (state) => {
     if (values.length > 0) q = parseBigNumber(values[0]);
 }
 var alwaysShowRefundButtons = () => true;
-var getPublicationMultiplier = (tau) => tau.pow(0.121)/BigNumber.FOUR;
-var getPublicationMultiplierFormula = (symbol) => "\\frac{{" + symbol + "}^{0.121}}{4}";
+var getPublicationMultiplier = (tau) => BigNumber.ONE;
+var getPublicationMultiplierFormula = (symbol) => "1";
 var getTau = () => currency.value;
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
-var canGoToPreviousStage = () => c1.level > 0;
-var goToPreviousStage = () => page.level -= 1;
-var canGoToNextStage = () => c1.level > 0;
-var goToNextStage = () => page.level += 1;
 
 var getC1 = (level) => Utils.getStepwisePowerSum(level, 2, 10, 0);
 var getC2 = (level) => BigNumber.TWO.pow(level);
