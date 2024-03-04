@@ -76,6 +76,13 @@ var init = () => {
             cost = BigNumber.from(cost) * BigNumber.from(3.74447096981) ** level;
             return BigNumber.from(cost);
         });
+    // Cost for c23
+    let c23Cost = new CustomCost((level) =>
+        {
+            var cost = 1;
+            cost = BigNumber.from(cost) * BigNumber.from(1e20) ** level;
+            return BigNumber.from(cost);
+        });
 
     // c1
     {
@@ -95,7 +102,7 @@ var init = () => {
     // c3
     {
         let getDesc = (level) => "c_3=" + getC23(level).toString(0);
-        c23 = theory.createUpgrade(baseId+2, currency2, new ExponentialCost(100, Math.log2(1.5)))
+        c23 = theory.createUpgrade(baseId+2, currency2, c23Cost)
         c23.getDescription = (_) => Utils.getMath(getDesc(c23.level));
         c23.getInfo = (amount) => Utils.getMathTo(getDesc(c23.level), getDesc(c23.level + amount));
     }
