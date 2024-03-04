@@ -282,7 +282,7 @@ var getPrimaryEquation = () => {
     result += "}"
     }
     else if (page.level == 1) {
-    result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} \\frac{(2c_1\\frac{c_2}{2})^{1+\\frac{c_3}{100}}}{1000}"
+    result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} \\frac{(2c_1\\frac{c_2}{2})}{1000}^{1+\\frac{c_3}{100}}"
     }
 
     if (page.level == 0) theory.primaryEquationScale = 0.9;
