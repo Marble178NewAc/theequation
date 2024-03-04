@@ -80,7 +80,7 @@ var init = () => {
     let c23Cost = new CustomCost((level) =>
         {
             var cost = 1;
-            cost = BigNumber.from(cost) * BigNumber.from(1e20) ** level;
+            cost = BigNumber.from(cost) * BigNumber.from(1e30) ** level;
             return BigNumber.from(cost);
         });
 
