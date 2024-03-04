@@ -69,6 +69,13 @@ var init = () => {
     }
 
     baseId += 100;
+    // Cost for c22
+    let c22Cost = new CustomCost((level) =>
+        {
+            var cost = 1;
+            cost = cost * 11 ** level;
+            return BigNumber.from(cost);
+        });
 
     // c1
     {
@@ -99,13 +106,6 @@ var init = () => {
         n.getDescription = (_) => Utils.getMath(getDesc(n.level));
         n.getInfo = (amount) => Utils.getMathTo(getDesc(n.level), getDesc(n.level + amount));
     }
-    // Cost for c22
-    let c22Cost = new CustomCost((level) =>
-        {
-            var cost = 1;
-            cost = cost * 11 ** level;
-            return BigNumber.from(cost);
-        })
 
     /////////////////////
     // Permanent Upgrades
