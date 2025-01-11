@@ -154,13 +154,11 @@ var init = () => {
     /////////////////
     //// Achievements
     aMoney = theory.createAchievementCategory(0, "Money");
-    aPub = theory.createAchievementCategory(1, "Publications")
     aSecret = theory.createAchievementCategory(2, "Secrets")
 
     achievement1 = theory.createAchievement(0, aMoney, "Thousands", "You reached 1000p, nice", () => currency.value > 1000);
     achievement2 = theory.createAchievement(1, aMoney, "Millions", "You reached 1e6p, what", () => currency.value > 1000000);
     achievement3 = theory.createAchievement(2, aMoney, "Billions", "You reached 1e4 p" + ", nice", () => currency.value > 1e9);
-    achievement3 = theory.createAchievement(3, aPub, "Starting Your Career", "You just unlocked publicztions, now get that one publications boy", () => theory.isPublicationAvailable)
     achievement4 = theory.createSecretAchievement(4, aSecret, "WHAT", "Haha funny number 69", "Do the funny number", () => c1.level == 69);
 
     ///////////////////
@@ -169,15 +167,12 @@ var init = () => {
 
     page.maxLevel = 1;
     n.maxLevel = 40;
-    c23.maxLevel = 30;
+    c23.maxLevel = 100;
 
     updateAvailability();
 }
 
 var updateAvailability = () => {
-    c2Exp.isAvailable = c1Exp.level > 0;
-    q2Exp.isAvailable = q1Exp.level > 0;
-
     c1.isAvailable = page.level == 0;
     c2.isAvailable = page.level == 0;
     q1.isAvailable = page.level == 0;
@@ -187,6 +182,8 @@ var updateAvailability = () => {
     c22.isAvailable = page.level == 1;
     c23.isAvailable = page.level == 1;
     n.isAvailable = page.level == 1;
+
+    page.isAvailable = false;
 }
 
 var tick = (elapsedTime, multiplier) => {
@@ -196,16 +193,12 @@ var tick = (elapsedTime, multiplier) => {
         q = getQ1(q1.level).pow(getQ1Exponent(q1Exp.level));
         currency.value += dt * bonus * getC1(c1.level).pow(getC1Exponent(c1Exp.level).square()) * q;
     }
-    else if (page.level == 0) {
     q += (getQ1(q1.level).pow(getQ1Exponent(q1Exp.level)) * getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))) / BigNumber.TWO
     beta = getC1(c1.level).pow(getC1Exponent(c1Exp.level)) / getQ2(q2.level).pow(getQ2Exponent(q2Exp.level))
     currency.value += dt * bonus * getC1(c1.level).pow(BigNumber.TWO ** getC1Exponent(c1Exp.level)) * q /
                                    getC2(c2.level).pow(getC2Exponent(c2Exp.level)) + getC2(c2.level).pow(getC2Exponent(c2Exp.level)) * (q / BigNumber.TWO) + currency2.value * (getC2(c2.level).pow(getC2Exponent(c2Exp.level)) / getC1(c1.level).pow(getC1Exponent(c1Exp.level))) * q.pow(1.5);
-    }
-    else if (page.level == 1) {
     for(let i = 0; i < getN(n.level); i++) {
     currency2.value += dt * bonus * (((((BigNumber.TWO * getC21(c21.level))) * ((getC22(c22.level) / BigNumber.TWO))))/BigNumber.HUNDRED).pow(BigNumber.ONE + getC23(c23.level)/BigNumber.THOUSAND); 
-    }
     }
     theory.invalidatePrimaryEquation();
     theory.invalidateTertiaryEquation();
@@ -216,70 +209,7 @@ var getPrimaryEquation = () => {
     let result = "";
 
     if (page.level == 0) {
-    result = "\\dot{\\rho_1} = \\frac{c_1";
-
-    if (c1Exp.level == 1) result += "^{1.05";
-    if (c1Exp.level == 2) result += "^{1.1";
-    if (c1Exp.level == 3) result += "^{1.15";
-
-    result += "^{2}";
-
-    if (c1Exp.level >= 1) result += "}";
-
-    result += "q";
-
-    result += "}{c_2}";
-
-    if (c2Exp.level == 1) result += "^{1.05}";
-    if (c2Exp.level == 2) result += "^{1.1}";
-    if (c2Exp.level == 3) result += "^{1.15}";
-
-    result += "+\\beta c_2";
-
-    if (c2Exp.level == 1) result += "^{1.05}";
-    if (c2Exp.level == 2) result += "^{1.1}";
-    if (c2Exp.level == 3) result += "^{1.15}";
-
-    result += "\\frac{q}{2}+\\frac{\\rho_2}{1000}\\frac{c_2";
-    
-    if (c2Exp.level == 1) result += "^{1.05}";
-    if (c2Exp.level == 2) result += "^{1.1}";
-    if (c2Exp.level == 3) result += "^{1.15}";
-
-    result += "}{c_1";
-
-    if (c1Exp.level == 1) result += "^{1.05}";
-    if (c1Exp.level == 2) result += "^{1.1}";
-    if (c1Exp.level == 3) result += "^{1.15}";
-
-    result += "}q^{1.5}\\quad \\dot{q}=\\frac{q_1"
-    
-
-    if (q1Exp.level == 1) result += "^{1.1}";
-    if (q1Exp.level == 2) result += "^{1.2}";
-    if (q1Exp.level == 3) result += "^{1.3}";
-
-    result += "q_2"
-
-    if (q2Exp.level == 1) result += "^{1.1}";
-    if (q2Exp.level == 2) result += "^{1.2}";
-    if (q2Exp.level == 3) result += "^{1.3}";
-
-    result += "}{2}"
-
-    result += "\\quad \\beta = \\frac{c_1";
-
-    if (c1Exp.level == 1) result += "^{1.05}";
-    if (c1Exp.level == 2) result += "^{1.1}";
-    if (c1Exp.level == 3) result += "^{1.15}";
-
-    result += "}{q_2";
-
-    if (q2Exp.level == 1) result += "^{1.1}";
-    if (q2Exp.level == 2) result += "^{1.2}";
-    if (q2Exp.level == 3) result += "^{1.3}";
-
-    result += "}"
+    result = "\\dot{\\rho_1} = \\frac{c_1^{2}q}{c_2}+\\beta c_2\\frac{q}{2}+\\frac{\\rho_2}{1000}\\frac{c_2}{c_1}q^{1.5}\\quad \\dot{q}=\\frac{q_1q_2}{2}\\quad \\beta = \\frac{c_1}{q_2}";
     }
     else if (page.level == 1) {
     result += "\\dot{\\rho_2}=\\sum_{a=1}^{n} (\\frac{2c_1\\frac{c_2}{2}}{100})^{1+\\frac{c_3}{100}}"
@@ -341,5 +271,10 @@ var getC1Exponent = (level) => BigNumber.from(1 + 0.05 * level);
 var getC2Exponent = (level) => BigNumber.from(1 + 0.05 * level);
 var getQ1Exponent = (level) => BigNumber.from(1 + 0.1 * level);
 var getQ2Exponent = (level) => BigNumber.from(1 + 0.1 * level);
+
+var canGoToPreviousStage = () => true && page.level > 0;
+var goToNextStage = () => page.level += 1;
+var canGoToNextStage = () => true && page.level < 1;
+var goToPreviousStage = () => page.level -= 1;
 
 init();
